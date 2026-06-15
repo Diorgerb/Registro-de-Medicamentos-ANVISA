@@ -60,10 +60,10 @@ export function ContatoPage() {
                 </p>
 
                 <a
-                  href="tel:+5531997722268"
+                  href="tel:+5531997722468"
                   className="text-brand-navy hover:underline font-medium"
                 >
-                  (31) 99772-2268
+                  (31) 99772-2468
                 </a>
               </div>
 
