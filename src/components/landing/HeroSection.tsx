@@ -45,8 +45,8 @@ export function HeroSection() {
 
             <div className="flex flex-wrap gap-8">
               <div>
-                <div className="text-3xl font-bold">12.000+</div>
-                <div className="text-sm text-blue-200 mt-1">Petições na base</div>
+                <div className="text-3xl font-bold">1.845+</div>
+                <div className="text-sm text-blue-200 mt-1">Petições protocoladas nos últimos 10 anos presentes na base</div>
               </div>
               <div className="border-l border-white/20 pl-8">
                 <div className="text-3xl font-bold">100%</div>
@@ -80,9 +80,9 @@ export function HeroSection() {
 
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {[
-                    { label: 'Deferimentos', val: '8.247', color: 'bg-green-500', pct: '67%' },
-                    { label: 'Indeferimentos', val: '4.073', color: 'bg-orange-500', pct: '33%' },
-                    { label: 'Total', val: '12.320', color: 'bg-blue-500', pct: '' },
+                    { label: 'Deferimentos', val: '1.392', color: 'bg-green-500', pct: '67%' },
+                    { label: 'Indeferimentos', val: '453', color: 'bg-orange-500', pct: '33%' },
+                    { label: 'Total', val: '1845', color: 'bg-blue-500', pct: '' },
                   ].map((item) => (
                     <div key={item.label} className="bg-white/8 rounded-xl p-4 border border-white/10">
                       <div className={`w-8 h-1.5 ${item.color} rounded mb-2`} />
