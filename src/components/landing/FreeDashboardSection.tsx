@@ -68,18 +68,18 @@ export function FreeDashboardSection() {
                   <div className="grid grid-cols-3 gap-3">
                     <div className="bg-green-50 border border-green-100 rounded-xl p-3">
                       <div className="text-xs text-green-600 font-medium mb-1">Deferimentos</div>
-                      <div className="text-xl font-bold text-green-700">8.247</div>
-                      <div className="text-xs text-green-500 mt-0.5">67%</div>
+                      <div className="text-xl font-bold text-green-700"> aprox 1.392</div>
+                      <div className="text-xs text-green-500 mt-0.5">75%</div>
                     </div>
                     <div className="bg-red-50 border border-red-100 rounded-xl p-3">
                       <div className="text-xs text-red-600 font-medium mb-1">Indeferimentos</div>
-                      <div className="text-xl font-bold text-red-700">4.073</div>
-                      <div className="text-xs text-red-500 mt-0.5">33%</div>
+                      <div className="text-xl font-bold text-red-700"> aprox 453</div>
+                      <div className="text-xs text-red-500 mt-0.5">25%</div>
                     </div>
                     <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
                       <div className="text-xs text-blue-600 font-medium mb-1">Total</div>
-                      <div className="text-xl font-bold text-blue-700">12.320</div>
-                      <div className="text-xs text-blue-500 mt-0.5">registros</div>
+                      <div className="text-xl font-bold text-blue-700">1.845</div>
+                      <div className="text-xs text-blue-500 mt-0.5">decisões na última década</div>
                     </div>
                   </div>
 
@@ -104,9 +104,9 @@ export function FreeDashboardSection() {
                   {/* Fake table rows */}
                   <div className="space-y-2">
                     {[
-                      { co: 'EUROFARMA', n: 342, s: 'Deferido', ok: true },
-                      { co: 'EMS S/A', n: 298, s: 'Deferido', ok: true },
-                      { co: 'MEDLEY', n: 187, s: 'Deferido', ok: false },
+                      { co: 'EMPRESA A', n: 342, s: 'Deferido', ok: true },
+                      { co: 'EMPRESA B', n: 298, s: 'Deferido', ok: true },
+                      { co: 'EMPRESA C', n: 187, s: 'Deferido', ok: true },
                     ].map((row, i) => (
                       <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-gray-50">
                         <span className="font-medium text-gray-700 truncate w-32">{row.co}</span>
