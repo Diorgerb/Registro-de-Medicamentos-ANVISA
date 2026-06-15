@@ -8,6 +8,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  TooltipItem,
 } from 'chart.js';
 
 ChartJS.register(
@@ -24,13 +25,27 @@ interface BarChartProps {
   title: string;
   color: string;
   maxItems?: number;
+  valueLabel?: string;
+  valueSuffix?: string;
+  maxY?: number;
+  sortBy?: 'value' | 'label';
+  showBadge?: boolean;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }) => {
-  // Sort and limit data
+const BarChart: React.FC<BarChartProps> = ({
+  data,
+  title,
+  color,
+  maxItems,
+  valueLabel = 'Quantidade',
+  valueSuffix = '',
+  maxY,
+  sortBy = 'value',
+  showBadge = true,
+}) => {
   const sortedEntries = Object.entries(data)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, maxItems);
+    .sort(([labelA, valueA], [labelB, valueB]) => (sortBy === 'label' ? labelA.localeCompare(labelB) : valueB - valueA))
+    .slice(0, maxItems ?? Object.keys(data).length);
 
   const chartData = {
     labels: sortedEntries.map(([key]) => 
@@ -38,12 +53,12 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }
     ),
     datasets: [
       {
-        label: 'Quantidade',
+        label: valueLabel,
         data: sortedEntries.map(([, value]) => value),
-        backgroundColor: color.replace('1)', '0.8)'),
+        backgroundColor: color.replace('1)', '0.78)'),
         borderColor: color,
-        borderWidth: 2,
-        borderRadius: 4,
+        borderWidth: 1,
+        borderRadius: 10,
         borderSkipped: false,
       },
     ],
@@ -57,7 +72,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }
         display: false,
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(15, 23, 42, 0.94)',
         titleFont: {
           size: 14,
           family: 'Inter, system-ui, sans-serif'
@@ -65,6 +80,9 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }
         bodyFont: {
           size: 12,
           family: 'Inter, system-ui, sans-serif'
+        },
+        callbacks: {
+          label: (context: TooltipItem<'bar'>) => `${context.dataset.label}: ${Number(context.raw).toLocaleString('pt-BR')}${valueSuffix}`,
         },
       }
     },
@@ -83,22 +101,32 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }
       },
       y: {
         beginAtZero: true,
+        max: maxY,
         grid: {
-          color: 'rgba(0, 0, 0, 0.1)',
+          color: 'rgba(148, 163, 184, 0.18)',
         },
         ticks: {
           font: {
             size: 11,
             family: 'Inter, system-ui, sans-serif'
-          }
+          },
+          callback: (value: string | number) => `${value}${valueSuffix}`,
         }
       },
     },
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>
+    <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm shadow-slate-200/70 ring-1 ring-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-slate-200/80">
+      <div className="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Análise comparativa</p>
+          <h3 className="mt-1 text-lg font-semibold text-slate-900">{title}</h3>
+        </div>
+        {showBadge && (
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Top {sortedEntries.length}</span>
+        )}
+      </div>
       <div className="h-80">
         <Bar data={chartData} options={options} />
       </div>

@@ -10,6 +10,20 @@ export interface AnvisaRecord {
   Tempo_Peticao: string;
 }
 
+export interface StatusBreakdown {
+  total: number;
+  deferimentos: number;
+  indeferimentos: number;
+  tempoTotal: number;
+  tempoCount: number;
+}
+
+export interface TimelineBucket {
+  deferimentos: number;
+  indeferimentos: number;
+  tempoMedio: number | number[];
+}
+
 export interface ProcessedData {
   totalRecords: number;
   deferimentos: number;
@@ -17,10 +31,12 @@ export interface ProcessedData {
   averageTime: number;
   empresas: { [key: string]: number };
   assuntos: { [key: string]: number };
+  empresasDetalhes: { [key: string]: StatusBreakdown };
+  assuntosDetalhes: { [key: string]: StatusBreakdown };
   temposPorSituacao: { [key: string]: number[] };
   timelineData: {
-    monthly: { [key: string]: { deferimentos: number; indeferimentos: number } };
-    yearly: { [key: string]: { deferimentos: number; indeferimentos: number } };
+    monthly: { [key: string]: TimelineBucket };
+    yearly: { [key: string]: TimelineBucket };
   };
   trends: {
     deferimentosTrend: 'increasing' | 'decreasing' | 'stable';
