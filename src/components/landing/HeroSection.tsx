@@ -46,7 +46,7 @@ export function HeroSection() {
             <div className="flex flex-wrap gap-8">
               <div>
                 <div className="text-3xl font-bold">1.845+</div>
-                <div className="text-sm text-blue-200 mt-1">Petições protocoladas nos últimos 10 anos presentes na base</div>
+                <div className="text-sm text-blue-200 mt-1">Base com protocolos dos últimos 10 anos</div>
               </div>
               <div className="border-l border-white/20 pl-8">
                 <div className="text-3xl font-bold">100%</div>
