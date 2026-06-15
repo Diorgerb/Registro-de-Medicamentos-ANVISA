@@ -28,13 +28,24 @@ interface BarChartProps {
   valueLabel?: string;
   valueSuffix?: string;
   maxY?: number;
+  sortBy?: 'value' | 'label';
+  showBadge?: boolean;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10, valueLabel = 'Quantidade', valueSuffix = '', maxY }) => {
-  // Sort and limit data
+const BarChart: React.FC<BarChartProps> = ({
+  data,
+  title,
+  color,
+  maxItems,
+  valueLabel = 'Quantidade',
+  valueSuffix = '',
+  maxY,
+  sortBy = 'value',
+  showBadge = true,
+}) => {
   const sortedEntries = Object.entries(data)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, maxItems);
+    .sort(([labelA, valueA], [labelB, valueB]) => (sortBy === 'label' ? labelA.localeCompare(labelB) : valueB - valueA))
+    .slice(0, maxItems ?? Object.keys(data).length);
 
   const chartData = {
     labels: sortedEntries.map(([key]) => 
@@ -112,7 +123,9 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10, 
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Análise comparativa</p>
           <h3 className="mt-1 text-lg font-semibold text-slate-900">{title}</h3>
         </div>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Top {sortedEntries.length}</span>
+        {showBadge && (
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Top {sortedEntries.length}</span>
+        )}
       </div>
       <div className="h-80">
         <Bar data={chartData} options={options} />

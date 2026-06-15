@@ -40,25 +40,11 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
       return [year, total > 0 ? Number(((values.deferimentos / total) * 100).toFixed(1)) : 0];
     })
   );
-  const monthlyVolume = Object.fromEntries(
-    Object.entries(data.timelineData.monthly).map(([month, values]) => [
-      month,
+  const yearlyVolume = Object.fromEntries(
+    Object.entries(data.timelineData.yearly).map(([year, values]) => [
+      year,
       values.deferimentos + values.indeferimentos,
     ])
-  );
-  const rejectionRateBySubject = Object.fromEntries(
-    Object.entries(data.assuntosDetalhes)
-      .filter(([, details]) => details.total >= minimumSampleSize)
-      .map(([subject, details]) => [subject, Number(((details.indeferimentos / details.total) * 100).toFixed(1))])
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 8)
-  );
-  const approvalRateByCompany = Object.fromEntries(
-    Object.entries(data.empresasDetalhes)
-      .filter(([, details]) => details.total >= minimumSampleSize)
-      .map(([company, details]) => [company, Number(((details.deferimentos / details.total) * 100).toFixed(1))])
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 8)
   );
   const averageTimeBySubject = Object.fromEntries(
     Object.entries(data.assuntosDetalhes)
@@ -67,6 +53,10 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
       .sort(([, a], [, b]) => b - a)
       .slice(0, 8)
   );
+
+  const yearWithHighestVolume = Object.entries(yearlyVolume).sort(([, a], [, b]) => b - a)[0];
+  const yearWithBestApproval = Object.entries(approvalRateByYear).sort(([, a], [, b]) => b - a)[0];
+  const slowestSubject = Object.entries(averageTimeBySubject).sort(([, a], [, b]) => b - a)[0];
 
   const statusData = {
     'Deferimentos': data.deferimentos,
@@ -220,20 +210,22 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <BarChart
-              data={monthlyVolume}
-              title="Volume Mensal de Petições"
+              data={yearlyVolume}
+              title="Volume de Petições por Ano"
               color="rgba(14, 165, 233, 1)"
-              maxItems={12}
               valueLabel="Petições"
+              sortBy="label"
+              showBadge={false}
             />
             <BarChart
               data={approvalRateByYear}
               title="Taxa de Aprovação por Ano"
               color="rgba(16, 185, 129, 1)"
-              maxItems={10}
               valueLabel="Taxa de aprovação"
               valueSuffix="%"
               maxY={100}
+              sortBy="label"
+              showBadge={false}
             />
           </div>
         </>
@@ -281,28 +273,10 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <BarChart
-          data={rejectionRateBySubject}
-          title="Assuntos com Maior Taxa de Indeferimento"
-          color="rgba(244, 63, 94, 1)"
-          maxItems={8}
-          valueLabel="Taxa de indeferimento"
-          valueSuffix="%"
-          maxY={100}
-        />
-        <BarChart
-          data={approvalRateByCompany}
-          title="Empresas com Maior Taxa de Aprovação"
-          color="rgba(20, 184, 166, 1)"
-          maxItems={8}
-          valueLabel="Taxa de aprovação"
-          valueSuffix="%"
-          maxY={100}
-        />
+      <div className="grid grid-cols-1 gap-6">
         <BarChart
           data={averageTimeBySubject}
-          title="Assuntos com Maior Tempo Médio"
+          title="Tempo Médio por Assunto"
           color="rgba(245, 158, 11, 1)"
           maxItems={8}
           valueLabel="Tempo médio"
@@ -312,6 +286,40 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
 
       {/* Additional Insights */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="rounded-2xl border border-sky-100 bg-white/95 p-6 shadow-sm shadow-slate-200/70">
+          <div className="flex items-center mb-3">
+            <BarChart3 className="h-5 w-5 text-sky-600 mr-2" />
+            <h3 className="font-semibold text-gray-800">Ano com Maior Volume</h3>
+          </div>
+          <p className="text-2xl font-bold text-sky-600 mb-1">{yearWithHighestVolume?.[0] || 'N/A'}</p>
+          <p className="text-sm text-gray-600">
+            {(yearWithHighestVolume?.[1] || 0).toLocaleString()} petições no período
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-emerald-100 bg-white/95 p-6 shadow-sm shadow-slate-200/70">
+          <div className="flex items-center mb-3">
+            <FileCheck className="h-5 w-5 text-emerald-600 mr-2" />
+            <h3 className="font-semibold text-gray-800">Melhor Ano de Aprovação</h3>
+          </div>
+          <p className="text-2xl font-bold text-emerald-600 mb-1">{yearWithBestApproval?.[0] || 'N/A'}</p>
+          <p className="text-sm text-gray-600">
+            {(yearWithBestApproval?.[1] || 0).toFixed(1)}% de aprovação
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-amber-100 bg-white/95 p-6 shadow-sm shadow-slate-200/70">
+          <div className="flex items-center mb-3">
+            <Clock className="h-5 w-5 text-amber-600 mr-2" />
+            <h3 className="font-semibold text-gray-800">Assunto Mais Demorado</h3>
+          </div>
+          <p className="text-sm font-bold text-amber-600 mb-1">
+            {slowestSubject?.[0]?.substring(0, 34) || 'N/A'}
+          </p>
+          <p className="text-xs text-gray-600">
+            {slowestSubject?.[1] || 0} dias em média
+          </p>
+        </div>
         <div className="rounded-2xl border border-blue-100 bg-white/95 p-6 shadow-sm shadow-slate-200/70">
           <div className="flex items-center mb-3">
             <TrendingUp className="h-5 w-5 text-blue-600 mr-2" />
