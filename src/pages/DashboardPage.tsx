@@ -88,7 +88,7 @@ export function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.10),transparent_32%),linear-gradient(135deg,#f8fafc_0%,#eef6ff_100%)] flex flex-col">
       <Navbar />
 
       {error && (
@@ -118,15 +118,15 @@ export function DashboardPage() {
       )}
 
       {!isLoading && !error && (
-        <div className="flex-1 max-w-7xl w-full mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="flex-1 max-w-7xl w-full mx-auto px-4 py-8 sm:py-10">
+          <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-white/80 bg-white/80 p-5 shadow-sm shadow-slate-200/70 backdrop-blur md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dashboard de Petições de Registro ANVISA</h1>
-              <p className="text-gray-500 text-sm mt-0.5">Dados oficiais de deferimentos e indeferimentos de medicamentos</p>
+              <h1 className="text-2xl font-bold text-slate-950">Dashboard de Petições de Registro ANVISA</h1>
+              <p className="text-slate-500 text-sm mt-1">Dados oficiais de deferimentos e indeferimentos de medicamentos</p>
             </div>
             <button
               onClick={loadCSVData}
-              className="flex items-center gap-2 text-sm bg-white border border-gray-200 hover:border-gray-300 px-4 py-2 rounded-lg shadow-sm transition"
+              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
             >
               <RefreshCw size={14} />
               Recarregar

@@ -32,9 +32,7 @@ export function Navbar() {
               key={link.to}
               onClick={() => navigate(link.to)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                page === link.to
-                  ? 'bg-white/15 text-white'
-                  : 'text-white/75 hover:text-white hover:bg-white/10'
+                page === link.to ? ACTIVE_LINK_STYLE : INACTIVE_LINK_STYLE
               }`}
             >
               {link.label}
@@ -66,9 +64,7 @@ export function Navbar() {
               key={link.to}
               onClick={() => { navigate(link.to); setOpen(false); }}
               className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition ${
-                page === link.to
-                  ? 'bg-white/15 text-white'
-                  : 'text-white/75 hover:text-white hover:bg-white/10'
+                page === link.to ? ACTIVE_LINK_STYLE : INACTIVE_LINK_STYLE
               } ${link.to === 'dashboard' ? 'mt-1 bg-white/10 text-white font-semibold' : ''}`}
             >
               {link.label}

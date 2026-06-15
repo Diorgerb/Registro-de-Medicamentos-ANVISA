@@ -30,6 +30,8 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
 
   const topEmpresas = getTopItems(data.empresas, 10);
   const topAssuntos = getTopItems(data.assuntos, 8);
+  const totalEmpresas = Object.keys(data.empresas).length;
+  const leadingCompany = Object.entries(data.empresas).sort(([, a], [, b]) => b - a)[0];
 
   const statusData = {
     'Deferimentos': data.deferimentos,
@@ -47,19 +49,41 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
   const hasTimelineData = Object.keys(data.timelineData.monthly).length > 0;
 
   return (
-    <div>
+    <div className="space-y-8">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Resultados da Análise
-        </h1>
-        <p className="text-gray-600">
-          {data.totalRecords.toLocaleString()} registros encontrados
-        </p>
+      <div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-950 shadow-2xl shadow-slate-200/80">
+        <div className="relative px-6 py-8 sm:px-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.35),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.22),transparent_35%)]" />
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-200">Resultados da análise</p>
+              <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                Painel executivo de petições ANVISA
+              </h1>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+                Visão consolidada de deferimentos, indeferimentos, tempo médio de análise e concentração por detentor da regularização.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+                <p className="text-xs text-slate-300">Registros</p>
+                <p className="text-xl font-bold text-white">{data.totalRecords.toLocaleString()}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+                <p className="text-xs text-slate-300">Aprovação</p>
+                <p className="text-xl font-bold text-emerald-300">{approvalRate}%</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3 backdrop-blur">
+                <p className="text-xs text-slate-300">Empresas</p>
+                <p className="text-xl font-bold text-blue-200">{totalEmpresas.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-5">
         <StatCard
           title="Total de Registros"
           value={data.totalRecords}
@@ -89,7 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
         />
         <StatCard
           title="Detentores da regularização"
-          value={Object.keys(data.empresas).length}
+          value={totalEmpresas}
           icon={Building2}
           color="purple"
         />
@@ -98,14 +122,19 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
       {/* Timeline Analysis Section */}
       {hasTimelineData && (
         <>
-          <div className="mb-6">
-            <div className="flex items-center mb-4">
-              <Calendar className="h-6 w-6 text-blue-600 mr-2" />
-              <h2 className="text-xl font-semibold text-gray-800">Análise Temporal</h2>
+          <div>
+            <div className="mb-5 flex items-center gap-3">
+              <div className="rounded-2xl bg-blue-50 p-3 text-blue-600 ring-1 ring-blue-100">
+                <Calendar className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Performance no tempo</p>
+                <h2 className="text-xl font-semibold text-slate-900">Análise Temporal</h2>
+              </div>
             </div>
             
             {/* Trend Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <TrendCard
                 title="Tendência de Deferimentos"
                 trend={data.trends.deferimentosTrend}
@@ -122,7 +151,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
           </div>
 
           {/* Timeline Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <LineChart
               data={data.timelineData.monthly}
               title="Evolução Mensal - Deferimentos vs Indeferimentos"
@@ -135,7 +164,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
           </div>
 
           {/* Yearly Evolution */}
-          <div className="mb-8">
+          <div>
             <LineChart
               data={data.timelineData.yearly}
               title="Evolução Anual - Deferimentos vs Indeferimentos"
@@ -144,7 +173,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
           </div>
 
           {/* Average Time with Trend */}
-              <div className="mb-8">
+              <div>
                 <LineChartWithTrend
                   data={Object.fromEntries(
                     Object.entries(data.timelineData.monthly).map(([key, val]) => [key, { tempoMedio: val.tempoMedio }])
@@ -157,7 +186,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
           )}
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Status Distribution */}
         <PieChart
           data={statusData}
@@ -179,7 +208,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
       </div>
 
       {/* Companies and Subjects Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <BarChart
           data={topEmpresas}
           title="Top 10 Empresas por Quantidade de Petições"
@@ -195,8 +224,8 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
       </div>
 
       {/* Additional Insights */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-6 border border-blue-200">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="rounded-2xl border border-blue-100 bg-white/95 p-6 shadow-sm shadow-slate-200/70">
           <div className="flex items-center mb-3">
             <TrendingUp className="h-5 w-5 text-blue-600 mr-2" />
             <h3 className="font-semibold text-gray-800">Taxa de Aprovação</h3>
@@ -207,20 +236,20 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl p-6 border border-green-200">
+        <div className="rounded-2xl border border-green-100 bg-white/95 p-6 shadow-sm shadow-slate-200/70">
           <div className="flex items-center mb-3">
             <Building2 className="h-5 w-5 text-green-600 mr-2" />
             <h3 className="font-semibold text-gray-800">Líder em Protocolos</h3>
           </div>
           <p className="text-sm font-bold text-green-600 mb-1">
-            {Object.entries(data.empresas).sort(([,a], [,b]) => b - a)[0]?.[0]?.substring(0, 25) || 'N/A'}
+            {leadingCompany?.[0]?.substring(0, 32) || 'N/A'}
           </p>
           <p className="text-xs text-gray-600">
-            {Object.entries(data.empresas).sort(([,a], [,b]) => b - a)[0]?.[1] || 0} petições
+            {leadingCompany?.[1] || 0} petições
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+        <div className="rounded-2xl border border-purple-100 bg-white/95 p-6 shadow-sm shadow-slate-200/70">
           <div className="flex items-center mb-3">
             <BarChart3 className="h-5 w-5 text-purple-600 mr-2" />
             <h3 className="font-semibold text-gray-800">Tendência Geral</h3>

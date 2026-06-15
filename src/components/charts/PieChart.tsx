@@ -1,10 +1,11 @@
 import React from 'react';
-import { Pie } from 'react-chartjs-2';
+import { Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   ArcElement,
   Tooltip,
   Legend,
+  TooltipItem,
 } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -22,9 +23,10 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, colors }) => {
       {
         data: Object.values(data),
         backgroundColor: colors,
-        borderColor: colors.map(color => color.replace('0.8', '1')),
-        borderWidth: 2,
-        hoverBorderWidth: 3,
+        borderColor: '#ffffff',
+        borderWidth: 4,
+        hoverBorderWidth: 6,
+        spacing: 3,
       },
     ],
   };
@@ -32,6 +34,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, colors }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    cutout: '62%',
     plugins: {
       legend: {
         position: 'bottom' as const,
@@ -44,7 +47,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, colors }) => {
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(15, 23, 42, 0.94)',
         titleFont: {
           size: 14,
           family: 'Inter, system-ui, sans-serif'
@@ -54,10 +57,12 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, colors }) => {
           family: 'Inter, system-ui, sans-serif'
         },
         callbacks: {
-          label: (context: any) => {
-            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-            const percentage = ((context.raw / total) * 100).toFixed(1);
-            return `${context.label}: ${context.raw} (${percentage}%)`;
+          label: (context: TooltipItem<'doughnut'>) => {
+            const values = context.dataset.data as number[];
+            const rawValue = Number(context.raw);
+            const total = values.reduce((a, b) => a + b, 0);
+            const percentage = total > 0 ? ((rawValue / total) * 100).toFixed(1) : '0.0';
+            return `${context.label}: ${rawValue} (${percentage}%)`;
           }
         }
       }
@@ -65,10 +70,13 @@ const PieChart: React.FC<PieChartProps> = ({ data, title, colors }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">{title}</h3>
-      <div className="h-64">
-        <Pie data={chartData} options={options} />
+    <div className="rounded-2xl border border-slate-200/80 bg-white/95 p-6 shadow-sm shadow-slate-200/70 ring-1 ring-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-slate-200/80">
+      <div className="mb-5 text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Composição</p>
+        <h3 className="mt-1 text-lg font-semibold text-slate-900">{title}</h3>
+      </div>
+      <div className="h-72">
+        <Doughnut data={chartData} options={options} />
       </div>
     </div>
   );

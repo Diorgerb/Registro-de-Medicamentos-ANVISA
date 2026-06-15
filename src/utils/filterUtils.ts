@@ -43,7 +43,7 @@ export const applyFilters = (data: AnvisaRecord[], filters: FilterOptions): Anvi
             return false;
           }
         }
-      } catch (error) {
+      } catch {
         return false;
       }
     }

@@ -66,7 +66,7 @@ export const processAnvisaData = (data: AnvisaRecord[], filteredData?: AnvisaRec
             processed.timelineData.yearly[yearKey].indeferimentos++;
           }
         }
-      } catch (error) {
+      } catch {
         console.warn('Invalid date format:', publicationDate);
       }
     }
