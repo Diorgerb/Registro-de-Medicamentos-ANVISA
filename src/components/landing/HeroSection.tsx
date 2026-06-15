@@ -80,8 +80,8 @@ export function HeroSection() {
 
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {[
-                    { label: 'Deferimentos', val: '1.392', color: 'bg-green-500', pct: '67%' },
-                    { label: 'Indeferimentos', val: '453', color: 'bg-orange-500', pct: '33%' },
+                    { label: 'Deferimentos', val: '1.392', color: 'bg-green-500', pct: '75%' },
+                    { label: 'Indeferimentos', val: '453', color: 'bg-orange-500', pct: '25%' },
                     { label: 'Total', val: '1845', color: 'bg-blue-500', pct: '' },
                   ].map((item) => (
                     <div key={item.label} className="bg-white/8 rounded-xl p-4 border border-white/10">
