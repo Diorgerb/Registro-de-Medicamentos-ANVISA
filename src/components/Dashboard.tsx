@@ -33,6 +33,41 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
   const totalEmpresas = Object.keys(data.empresas).length;
   const leadingCompany = Object.entries(data.empresas).sort(([, a], [, b]) => b - a)[0];
 
+  const minimumSampleSize = 3;
+  const approvalRateByYear = Object.fromEntries(
+    Object.entries(data.timelineData.yearly).map(([year, values]) => {
+      const total = values.deferimentos + values.indeferimentos;
+      return [year, total > 0 ? Number(((values.deferimentos / total) * 100).toFixed(1)) : 0];
+    })
+  );
+  const monthlyVolume = Object.fromEntries(
+    Object.entries(data.timelineData.monthly).map(([month, values]) => [
+      month,
+      values.deferimentos + values.indeferimentos,
+    ])
+  );
+  const rejectionRateBySubject = Object.fromEntries(
+    Object.entries(data.assuntosDetalhes)
+      .filter(([, details]) => details.total >= minimumSampleSize)
+      .map(([subject, details]) => [subject, Number(((details.indeferimentos / details.total) * 100).toFixed(1))])
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 8)
+  );
+  const approvalRateByCompany = Object.fromEntries(
+    Object.entries(data.empresasDetalhes)
+      .filter(([, details]) => details.total >= minimumSampleSize)
+      .map(([company, details]) => [company, Number(((details.deferimentos / details.total) * 100).toFixed(1))])
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 8)
+  );
+  const averageTimeBySubject = Object.fromEntries(
+    Object.entries(data.assuntosDetalhes)
+      .filter(([, details]) => details.tempoCount >= minimumSampleSize)
+      .map(([subject, details]) => [subject, Math.round(details.tempoTotal / details.tempoCount)])
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 8)
+  );
+
   const statusData = {
     'Deferimentos': data.deferimentos,
     'Indeferimentos': data.indeferimentos,
@@ -173,17 +208,36 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
           </div>
 
           {/* Average Time with Trend */}
-              <div>
-                <LineChartWithTrend
-                  data={Object.fromEntries(
-                    Object.entries(data.timelineData.monthly).map(([key, val]) => [key, { tempoMedio: val.tempoMedio }])
-                  )}
-                  title="Evolução do Tempo Médio de Análise (Mensal)"
-                  type="monthly"
-                />
-              </div>
-            </>
-          )}
+          <div>
+            <LineChartWithTrend
+              data={Object.fromEntries(
+                Object.entries(data.timelineData.monthly).map(([key, val]) => [key, { tempoMedio: Number(val.tempoMedio) }])
+              )}
+              title="Evolução do Tempo Médio de Análise (Mensal)"
+              type="monthly"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <BarChart
+              data={monthlyVolume}
+              title="Volume Mensal de Petições"
+              color="rgba(14, 165, 233, 1)"
+              maxItems={12}
+              valueLabel="Petições"
+            />
+            <BarChart
+              data={approvalRateByYear}
+              title="Taxa de Aprovação por Ano"
+              color="rgba(16, 185, 129, 1)"
+              maxItems={10}
+              valueLabel="Taxa de aprovação"
+              valueSuffix="%"
+              maxY={100}
+            />
+          </div>
+        </>
+      )}
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -203,6 +257,8 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
             data={avgTimeByStatus}
             title="Tempo Médio por Situação (dias)"
             color="rgba(59, 130, 246, 1)"
+            valueLabel="Tempo médio"
+            valueSuffix=" dias"
           />
         )}
       </div>
@@ -214,12 +270,43 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
           title="Top 10 Empresas por Quantidade de Petições"
           color="rgba(168, 85, 247, 1)"
           maxItems={10}
+          valueLabel="Petições"
         />
         <BarChart
           data={topAssuntos}
           title="Principais Assuntos"
           color="rgba(34, 197, 94, 1)"
           maxItems={8}
+          valueLabel="Petições"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <BarChart
+          data={rejectionRateBySubject}
+          title="Assuntos com Maior Taxa de Indeferimento"
+          color="rgba(244, 63, 94, 1)"
+          maxItems={8}
+          valueLabel="Taxa de indeferimento"
+          valueSuffix="%"
+          maxY={100}
+        />
+        <BarChart
+          data={approvalRateByCompany}
+          title="Empresas com Maior Taxa de Aprovação"
+          color="rgba(20, 184, 166, 1)"
+          maxItems={8}
+          valueLabel="Taxa de aprovação"
+          valueSuffix="%"
+          maxY={100}
+        />
+        <BarChart
+          data={averageTimeBySubject}
+          title="Assuntos com Maior Tempo Médio"
+          color="rgba(245, 158, 11, 1)"
+          maxItems={8}
+          valueLabel="Tempo médio"
+          valueSuffix=" dias"
         />
       </div>
 

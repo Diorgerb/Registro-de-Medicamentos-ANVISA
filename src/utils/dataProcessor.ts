@@ -1,4 +1,4 @@
-import { AnvisaRecord, ProcessedData } from '../types/AnvisaData';
+import { AnvisaRecord, ProcessedData, StatusBreakdown } from '../types/AnvisaData';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -12,6 +12,8 @@ export const processAnvisaData = (data: AnvisaRecord[], filteredData?: AnvisaRec
     averageTime: 0,
     empresas: {},
     assuntos: {},
+    empresasDetalhes: {},
+    assuntosDetalhes: {},
     temposPorSituacao: {},
     timelineData: {
       monthly: {},
@@ -27,6 +29,14 @@ export const processAnvisaData = (data: AnvisaRecord[], filteredData?: AnvisaRec
 
   let totalTime = 0;
   let validTimeRecords = 0;
+
+  const createBreakdown = (): StatusBreakdown => ({
+    total: 0,
+    deferimentos: 0,
+    indeferimentos: 0,
+    tempoTotal: 0,
+    tempoCount: 0,
+  });
 
   dataToProcess.forEach(record => {
     const isDeferimento = record.situacao_descricao === "Foi publicado o deferimento do processo ou da petição.";
@@ -71,16 +81,23 @@ export const processAnvisaData = (data: AnvisaRecord[], filteredData?: AnvisaRec
       }
     }
 
-    // Count by company
+    // Count by company and subject
     const empresa = record.empresa_razaoSocial;
     if (empresa) {
       processed.empresas[empresa] = (processed.empresas[empresa] || 0) + 1;
+      processed.empresasDetalhes[empresa] = processed.empresasDetalhes[empresa] || createBreakdown();
+      processed.empresasDetalhes[empresa].total++;
+      if (isDeferimento) processed.empresasDetalhes[empresa].deferimentos++;
+      if (isIndeferimento) processed.empresasDetalhes[empresa].indeferimentos++;
     }
 
-    // Count by subject
     const assunto = record.assunto_descricao;
     if (assunto) {
       processed.assuntos[assunto] = (processed.assuntos[assunto] || 0) + 1;
+      processed.assuntosDetalhes[assunto] = processed.assuntosDetalhes[assunto] || createBreakdown();
+      processed.assuntosDetalhes[assunto].total++;
+      if (isDeferimento) processed.assuntosDetalhes[assunto].deferimentos++;
+      if (isIndeferimento) processed.assuntosDetalhes[assunto].indeferimentos++;
     }
 
     // Calculate time statistics
@@ -88,6 +105,16 @@ export const processAnvisaData = (data: AnvisaRecord[], filteredData?: AnvisaRec
     if (!isNaN(tempo) && tempo > 0) {
       totalTime += tempo;
       validTimeRecords++;
+
+      if (empresa) {
+        processed.empresasDetalhes[empresa].tempoTotal += tempo;
+        processed.empresasDetalhes[empresa].tempoCount++;
+      }
+
+      if (assunto) {
+        processed.assuntosDetalhes[assunto].tempoTotal += tempo;
+        processed.assuntosDetalhes[assunto].tempoCount++;
+      }
 
       // Group times by situation for more detailed analysis
       if (!processed.temposPorSituacao[record.situacao_descricao]) {
@@ -101,8 +128,8 @@ export const processAnvisaData = (data: AnvisaRecord[], filteredData?: AnvisaRec
         if (isValid(date)) {
           const monthKey = format(date, 'yyyy-MM', { locale: ptBR });
           const yearKey = format(date, 'yyyy', { locale: ptBR });
-          processed.timelineData.monthly[monthKey].tempoMedio.push(tempo);
-          processed.timelineData.yearly[yearKey].tempoMedio.push(tempo);
+          (processed.timelineData.monthly[monthKey].tempoMedio as number[]).push(tempo);
+          (processed.timelineData.yearly[yearKey].tempoMedio as number[]).push(tempo);
         }
       }
     }
@@ -112,14 +139,14 @@ export const processAnvisaData = (data: AnvisaRecord[], filteredData?: AnvisaRec
 
   // Finalize tempoMedio: calcular média para cada mês e ano
   Object.keys(processed.timelineData.monthly).forEach(month => {
-    const tempos = processed.timelineData.monthly[month].tempoMedio;
+    const tempos = processed.timelineData.monthly[month].tempoMedio as number[];
     processed.timelineData.monthly[month].tempoMedio = tempos.length
       ? tempos.reduce((a,b)=>a+b,0)/tempos.length
       : 0;
   });
 
   Object.keys(processed.timelineData.yearly).forEach(year => {
-    const tempos = processed.timelineData.yearly[year].tempoMedio;
+    const tempos = processed.timelineData.yearly[year].tempoMedio as number[];
     processed.timelineData.yearly[year].tempoMedio = tempos.length
       ? tempos.reduce((a,b)=>a+b,0)/tempos.length
       : 0;
@@ -130,7 +157,7 @@ export const processAnvisaData = (data: AnvisaRecord[], filteredData?: AnvisaRec
   return processed;
 };
 
-const calculateTrends = (monthlyData: { [key: string]: { deferimentos: number; indeferimentos: number } }) => {
+const calculateTrends = (monthlyData: ProcessedData['timelineData']['monthly']) => {
   const sortedMonths = Object.keys(monthlyData).sort();
   
   if (sortedMonths.length < 2) {

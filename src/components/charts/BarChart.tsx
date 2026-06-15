@@ -8,6 +8,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  TooltipItem,
 } from 'chart.js';
 
 ChartJS.register(
@@ -24,9 +25,12 @@ interface BarChartProps {
   title: string;
   color: string;
   maxItems?: number;
+  valueLabel?: string;
+  valueSuffix?: string;
+  maxY?: number;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }) => {
+const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10, valueLabel = 'Quantidade', valueSuffix = '', maxY }) => {
   // Sort and limit data
   const sortedEntries = Object.entries(data)
     .sort(([, a], [, b]) => b - a)
@@ -38,7 +42,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }
     ),
     datasets: [
       {
-        label: 'Quantidade',
+        label: valueLabel,
         data: sortedEntries.map(([, value]) => value),
         backgroundColor: color.replace('1)', '0.78)'),
         borderColor: color,
@@ -66,6 +70,9 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }
           size: 12,
           family: 'Inter, system-ui, sans-serif'
         },
+        callbacks: {
+          label: (context: TooltipItem<'bar'>) => `${context.dataset.label}: ${Number(context.raw).toLocaleString('pt-BR')}${valueSuffix}`,
+        },
       }
     },
     scales: {
@@ -83,6 +90,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }
       },
       y: {
         beginAtZero: true,
+        max: maxY,
         grid: {
           color: 'rgba(148, 163, 184, 0.18)',
         },
@@ -90,7 +98,8 @@ const BarChart: React.FC<BarChartProps> = ({ data, title, color, maxItems = 10 }
           font: {
             size: 11,
             family: 'Inter, system-ui, sans-serif'
-          }
+          },
+          callback: (value: string | number) => `${value}${valueSuffix}`,
         }
       },
     },
