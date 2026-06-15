@@ -83,7 +83,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-200">Resultados da análise com base nos filtros aplicados</p>
               <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Resumo de petições protocoladas na ANVISA nos últimos 10 anos
+                Petições de Registro protocoladas nos últimos 10 anos
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
                 Visão consolidada de deferimentos, indeferimentos, tempo médio de análise e concentração por detentor da regularização.
