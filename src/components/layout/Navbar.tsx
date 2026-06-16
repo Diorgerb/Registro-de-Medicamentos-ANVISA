@@ -22,7 +22,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <button onClick={() => navigate('home')} className="hover:opacity-80 transition flex-shrink-0">
-          <img src="/logoDBPROCESSOS1.png" alt="DPROCESSOS" className="h-9" />
+          <img src="/logoDBPROCESSOS1.png" alt="DPROCESSOS" className="h-7" />
         </button>
 
         {/* Desktop nav */}
